@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+    minio:
+        image: 'bitnami/minio:latest'
+        container_name: minio-sister
+        ports:
+            - '9000:9000'
+            - '9001:9001'
+        volumes:
+            - minio-storage:/data
+        environment:
+            - MINIO_ROOT_USER=minioadmin
+            - MINIO_ROOT_PASSWORD=punya-apple
+        networks:
+            - app-tier
+            
+    app:
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile
+        image: 'sister-minio'
+        container_name: web-sister
+        ports:
+            - 8001:80
+        environment:
+            - MINIO_SERVER_ACCESS_KEY=3n41GbGThzL06ll0
+            - MINIO_SERVER_SECRET_KEY=DruU6yMYpiUrjY4dw4J4j13VUTK6IERH
+        volumes:
+            - ./:/var/www/html
+        networks:
+            - app-tier
+
+networks:
+    app-tier:
+        driver: bridge
+
+volumes:
+    minio-storage:
+        external: true
